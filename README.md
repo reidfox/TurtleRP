@@ -1,3 +1,8 @@
+# Project Depreciated.
+## So long, and thanks for the Turtles.
+This will still work on probably any 1.12 client but I will no longer be supporting it. Viva la Turtle.
+Check out my 3.3.5 addons.
+
 ## Turtle RP 2
 
 Turtle's RP scene has been an integral party of the community since the earliest days of the network. This addon was forked and made official after numerous community requests for assistance moderating and growing the roleplay community.

@@ -824,17 +824,18 @@
         local x, y = this:GetCenter();
         local parentX, parentY = this:GetParent():GetCenter();
         if ( x > parentX ) then
-          WorldMapTooltip:SetOwner(this, "ANCHOR_LEFT");
+          GameTooltip:SetOwner(this, "ANCHOR_LEFT");
         else
-          WorldMapTooltip:SetOwner(this, "ANCHOR_RIGHT");
+          GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
         end
-        if this.full_name ~= nil then
-          WorldMapTooltip:SetText(this.full_name);
-          WorldMapTooltip:Show();
+        local profileName = this.full_name or this.player_name;
+        if profileName ~= nil then
+          GameTooltip:SetText(profileName);
+          GameTooltip:Show();
         end
       </OnEnter>
       <OnLeave>
-        WorldMapTooltip:Hide();
+        GameTooltip:Hide();
       </OnLeave>
     </Scripts>
   </Button>

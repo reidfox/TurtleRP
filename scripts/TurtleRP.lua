@@ -16,7 +16,7 @@ TurtleRP.latestVersion = TurtleRP.currentVersion
 TurtleRP.channelName = "TTRP"
 TurtleRP.channelIndex = 0
 TurtleRP.timeBetweenPings = 30
-TurtleRP.minChatLevel = 10
+TurtleRP.minChatLevel = 5
 TurtleRP.currentlyRequestedData = nil
 TurtleRP.disableMessageSending = nil
 TurtleRP.sendingLongForm = nil
@@ -3311,14 +3311,14 @@ function TurtleRP.IsVersionOlder(versionA, versionB)
   return a3 < b3
 end
 
--- Offer to join /rp channel upon reaching level 10, or first login after installing/update.
+-- Offer to join /rp channel upon reaching the minimum chat level, or first login after installing/update.
 function TurtleRP.CheckLevelForChannel(newLevel, isLogin)
     local id, name = GetChannelName("rp")
     if id > 0 then 
         TurtleRPSettings["seen_rp_prompt"] = "1"
         return 
     end
-    if newLevel >= 10 and TurtleRPSettings["seen_rp_prompt"] ~= "1" then
+    if newLevel >= TurtleRP.minChatLevel and TurtleRPSettings["seen_rp_prompt"] ~= "1" then
         local delay = isLogin and 30 or 10;
         
         local timerFrame = CreateFrame("Frame");
@@ -3339,7 +3339,7 @@ function TurtleRP.ShowRPPopup(isLogin)
         TurtleRPSettings["seen_rp_prompt"] = "1"
         return 
     end
-    local popupText = "You've reached level 10! Would you like to join the RP channel to find other roleplayers?";
+    local popupText = "You've reached level " .. TurtleRP.minChatLevel .. "! Would you like to join the RP channel to find other roleplayers?";
     if isLogin then
         popupText = "Thank you for installing TurtleRP! Would you like to join the global /rp channel to find other roleplayers?";
     end
@@ -3876,27 +3876,6 @@ function TurtleRP.ReplaceNamesInChat(text)
     return text
 end
 
-function TurtleRP.ResetChatWindowVisuals()
-    local i
-    for i = 1, 7 do
-        local frame = getglobal("ChatFrame" .. i)
-        local background = getglobal("ChatFrame" .. i .. "Background")
-        if frame then
-            if FCF_SetWindowColor then
-                FCF_SetWindowColor(frame, 0, 0, 0)
-            end
-            if FCF_SetWindowAlpha then
-                FCF_SetWindowAlpha(frame, 0)
-            end
-        end
-        if background then
-            background:SetVertexColor(0, 0, 0)
-            background:SetAlpha(0)
-            background:Hide()
-        end
-    end
-end
-
 function TurtleRP.InitializeChatHooksDeferred()
     if TurtleRP.chatHooksDelayFrame then
         TurtleRP.chatHooksDelayFrame.elapsed = 0
@@ -3911,7 +3890,6 @@ function TurtleRP.InitializeChatHooksDeferred()
             if not TurtleRP.currentEmoteFrameAdapter then
                 TurtleRP.emote_events()
             end
-            TurtleRP.ResetChatWindowVisuals()
             if ChatFrame1 and FCF_SetWindowName then
                 local chatName = GetChatWindowInfo(1)
                 if not chatName or chatName == "" then
@@ -3935,7 +3913,6 @@ function TurtleRP.InitializeChatHooksDeferred()
         if not TurtleRP.currentEmoteFrameAdapter then
             TurtleRP.emote_events()
         end
-        TurtleRP.ResetChatWindowVisuals()
         if ChatFrame1 and FCF_SetWindowName then
             local chatName = GetChatWindowInfo(1)
             if not chatName or chatName == "" then

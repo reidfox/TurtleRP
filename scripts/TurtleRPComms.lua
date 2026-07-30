@@ -188,6 +188,26 @@ function TurtleRP.mouseover_and_target_events()
       TurtleRP.buildPetTooltip("target")
     end
   end)
+
+  local function HookPlayerFrame(playerFrame)
+    if not playerFrame or playerFrame.TurtleRPSelfTooltipHooked then
+      return
+    end
+
+    playerFrame.TurtleRPSelfTooltipHooked = true
+    playerFrame:EnableMouse()
+    local defaultPlayerFrameFunction = playerFrame:GetScript("OnEnter")
+    playerFrame:SetScript("OnEnter", function()
+      if defaultPlayerFrameFunction then
+        defaultPlayerFrameFunction()
+      end
+
+      TurtleRP.buildTooltip(UnitName("player"), "player")
+    end)
+  end
+
+  HookPlayerFrame(PlayerFrame)
+  HookPlayerFrame(DF_PlayerFrame)
 end
 
 ----

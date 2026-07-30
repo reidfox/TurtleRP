@@ -1092,11 +1092,14 @@ function TurtleRP.ShouldShareLocation()
 end
 
 function TurtleRP.showColorPicker(r, g, b, a, changedCallback)
+ ColorPickerFrame:Hide();
+ -- Clear callbacks left by Blizzard's chat color picker before setting our color.
+ -- SetColorRGB can fire the currently assigned callback immediately.
+ ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc = nil, nil, nil;
  ColorPickerFrame:SetColorRGB(r, g, b);
  ColorPickerFrame.hasOpacity, ColorPickerFrame.opacity = (a ~= nil), a;
  ColorPickerFrame.previousValues = {r,g,b,a};
  ColorPickerFrame.func, ColorPickerFrame.opacityFunc, ColorPickerFrame.cancelFunc = changedCallback, changedCallback, changedCallback;
- ColorPickerFrame:Hide(); 
  ColorPickerFrame:Show();
 end
 

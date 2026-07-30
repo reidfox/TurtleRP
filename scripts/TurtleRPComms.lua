@@ -175,19 +175,31 @@ function TurtleRP.mouseover_and_target_events()
     end
   end)
 
-  TurtleRP.targetFrame:EnableMouse()
-  local defaultTargetFrameFunction = TurtleRP.targetFrame:GetScript("OnEnter")
-  TurtleRP.targetFrame:SetScript("OnEnter", function()
-    if defaultTargetFrameFunction then
-      defaultTargetFrameFunction()
+  local function HookTargetFrame(targetFrame)
+    if not targetFrame then
+      return
     end
 
-    if UnitName("target") == UnitName("player") then
-      TurtleRP.buildTooltip(UnitName("player"), "target")
-    elseif TurtleRP.IsOwnedPetUnit and TurtleRP.IsOwnedPetUnit("target") then
-      TurtleRP.buildPetTooltip("target")
+    local currentTargetFrameFunction = targetFrame:GetScript("OnEnter")
+    if currentTargetFrameFunction == targetFrame.TurtleRPTargetTooltipHandler then
+      return
     end
-  end)
+
+    targetFrame:EnableMouse()
+    local targetFrameTooltipHandler = function()
+      if currentTargetFrameFunction then
+        currentTargetFrameFunction()
+      end
+
+      if UnitName("target") == UnitName("player") then
+        TurtleRP.buildTooltip(UnitName("player"), "target")
+      elseif TurtleRP.IsOwnedPetUnit and TurtleRP.IsOwnedPetUnit("target") then
+        TurtleRP.buildPetTooltip("target")
+      end
+    end
+    targetFrame.TurtleRPTargetTooltipHandler = targetFrameTooltipHandler
+    targetFrame:SetScript("OnEnter", targetFrameTooltipHandler)
+  end
 
   local function HookPlayerFrame(playerFrame)
     if not playerFrame then
@@ -211,17 +223,21 @@ function TurtleRP.mouseover_and_target_events()
     playerFrame:SetScript("OnEnter", playerFrameTooltipHandler)
   end
 
+  HookTargetFrame(TurtleRP.targetFrame)
+  HookTargetFrame(DF_TargetFrame)
   HookPlayerFrame(PlayerFrame)
   HookPlayerFrame(DF_PlayerFrame)
 
   -- Replacement unit-frame addons may create or configure their frames after
   -- TurtleRP's login event. Retry briefly so our tooltip remains the last layer.
-  local playerFrameHookDelay = CreateFrame("Frame")
-  playerFrameHookDelay.elapsed = 0
-  playerFrameHookDelay.nextAttempt = 0
-  playerFrameHookDelay:SetScript("OnUpdate", function()
+  local unitFrameHookDelay = CreateFrame("Frame")
+  unitFrameHookDelay.elapsed = 0
+  unitFrameHookDelay.nextAttempt = 0
+  unitFrameHookDelay:SetScript("OnUpdate", function()
     this.elapsed = this.elapsed + arg1
     if this.elapsed >= this.nextAttempt then
+      HookTargetFrame(TurtleRP.targetFrame)
+      HookTargetFrame(DF_TargetFrame)
       HookPlayerFrame(PlayerFrame)
       HookPlayerFrame(DF_PlayerFrame)
       this.nextAttempt = this.nextAttempt + 0.5

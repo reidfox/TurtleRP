@@ -190,24 +190,46 @@ function TurtleRP.mouseover_and_target_events()
   end)
 
   local function HookPlayerFrame(playerFrame)
-    if not playerFrame or playerFrame.TurtleRPSelfTooltipHooked then
+    if not playerFrame then
       return
     end
 
-    playerFrame.TurtleRPSelfTooltipHooked = true
+    local currentPlayerFrameFunction = playerFrame:GetScript("OnEnter")
+    if currentPlayerFrameFunction == playerFrame.TurtleRPSelfTooltipHandler then
+      return
+    end
+
     playerFrame:EnableMouse()
-    local defaultPlayerFrameFunction = playerFrame:GetScript("OnEnter")
-    playerFrame:SetScript("OnEnter", function()
-      if defaultPlayerFrameFunction then
-        defaultPlayerFrameFunction()
+    local playerFrameTooltipHandler = function()
+      if currentPlayerFrameFunction then
+        currentPlayerFrameFunction()
       end
 
       TurtleRP.buildTooltip(UnitName("player"), "player")
-    end)
+    end
+    playerFrame.TurtleRPSelfTooltipHandler = playerFrameTooltipHandler
+    playerFrame:SetScript("OnEnter", playerFrameTooltipHandler)
   end
 
   HookPlayerFrame(PlayerFrame)
   HookPlayerFrame(DF_PlayerFrame)
+
+  -- Replacement unit-frame addons may create or configure their frames after
+  -- TurtleRP's login event. Retry briefly so our tooltip remains the last layer.
+  local playerFrameHookDelay = CreateFrame("Frame")
+  playerFrameHookDelay.elapsed = 0
+  playerFrameHookDelay.nextAttempt = 0
+  playerFrameHookDelay:SetScript("OnUpdate", function()
+    this.elapsed = this.elapsed + arg1
+    if this.elapsed >= this.nextAttempt then
+      HookPlayerFrame(PlayerFrame)
+      HookPlayerFrame(DF_PlayerFrame)
+      this.nextAttempt = this.nextAttempt + 0.5
+    end
+    if this.elapsed >= 5 then
+      this:SetScript("OnUpdate", nil)
+    end
+  end)
 end
 
 ----

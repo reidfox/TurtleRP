@@ -4199,9 +4199,9 @@
       </Button> -->
       <Button name="$parent_SpellBookCloseButton" inherits="UIPanelCloseButton">
 		  <Anchors>
-			<Anchor point="CENTER" relativeTo="SpellBookFrame" relativePoint="TOPRIGHT">
+			<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
 			  <Offset>
-				<AbsDimension x="-44" y="-26"/>
+				<AbsDimension x="-30" y="-8"/>
 			  </Offset>
 			</Anchor>
 		  </Anchors>
